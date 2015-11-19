@@ -12,7 +12,9 @@ import android.view.View;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import utilities.HelperFunctions;
 import utilities.MorseParser;
 
 
@@ -128,8 +130,12 @@ public class MessageActivity extends Activity {
         //getting the message data
         Bundle bundle  = getIntent().getExtras();
         msgData = bundle.getString("MESSAGE");
-        MorseParser parser = new MorseParser(currentLetter,msgData);
-        parser.displayMesage();
+        MorseParser parser = new MorseParser(currentLetter,msgData,this);
+        parser.displayMessage();
+
+        boolean hasFlash = HelperFunctions.hasLight(this);
+
+        Toast.makeText(this,String.valueOf(hasFlash),Toast.LENGTH_SHORT).show();
     }
 
     @Override

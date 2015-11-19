@@ -1,5 +1,7 @@
 package utilities;
 
+import android.content.Context;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -24,7 +26,9 @@ public class MorseParser {
     TextView currentLetter;
     private String message;
     public char[] letters;
-    public char actualLetter;
+    public  char actualLetter;
+    public int  actualLetterIndex;
+    private Context context;
 
     private Map<String, Integer[]> morseLetters = new HashMap<String, Integer[]>();
 
@@ -36,43 +40,116 @@ public class MorseParser {
         }
     };
 
-    public MorseParser(TextView currentLetter,String message)
+    public MorseParser(TextView currentLetter,String message,Context context)
     {
         this.currentLetter = currentLetter;
         this.message = message;
         this.letters = message.toCharArray();
-
+        this.context = context;
         //filling the morse letters
         this.fillLetters();
     }
 
 
-    public void displayMesage()
+    public void displayMessage()
     {
-        currentLetter.setText("Z");
-        final char[] l = this.letters;
-        final Timer timer = new Timer();
-
-        timer.scheduleAtFixedRate(new TimerTask()
-        {
-            int i = 0;
-            public void run()
-            {
-                UpdateLetterView(l[i]);
-                Log.d("Parser debug",String.valueOf(l[i]));
-                i++;
-                if (i > l.length-1)
-                {
-                    timer.cancel();
-                }
-            }
-        }, 0, 1000);
+        this.actualLetter = this.letters[0];
+        this.actualLetterIndex = 0;
+        int duration = getLetterDuration(morseLetters.get(String.valueOf(this.actualLetter)));
+        Log.d("Letra", actualLetter + " " + String.valueOf(duration));
+        UpdateLetterView();
 
     }
 
-    private void UpdateLetterView(char letter) {
-        actualLetter = letter;
+    private void initializeLetterPart(final Integer[] parts, final int index){
+
+        final int duration = parts[index];
+        //Log.d("Test",String.valueOf(duration));
+        new CountDownTimer(duration * 1000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+            }
+
+            public void onFinish() {
+
+                Log.d("Letter part","Part number "+index+" of duration "+duration);
+                if(index < parts.length -1 )
+                {
+                    new CountDownTimer((silence * 1000), 1000) {
+
+                        public void onTick(long millisUntilFinished) {
+                        }
+
+                        public void onFinish() {
+
+                            Log.d("Letter part","End of the part now a silence");
+                            initializeLetterPart(parts,index+1);
+
+                        }
+                    }.start();
+                }
+                else
+                {
+                    new CountDownTimer((space * 1000), 1000) {
+
+                        public void onTick(long millisUntilFinished) {
+
+                        }
+
+                        public void onFinish() {
+                            Log.d("Letter part","End of the word now a space");
+
+                            if(actualLetterIndex < letters.length -1)
+                            {
+                                actualLetterIndex += 1;
+                                actualLetter  = letters[actualLetterIndex];
+                                UpdateLetterView();
+                            }
+                            else
+                            {
+
+                            }
+                        }
+                    }.start();
+                }
+
+            }
+        }.start();
+    }
+
+    private void UpdateLetterView() {
         myHandler.post(myRunnable);
+        Integer[] parts = morseLetters.get(String.valueOf(this.actualLetter));
+        int currentPart = 0;
+        initializeLetterPart(parts,currentPart);
+
+        /*new CountDownTimer((duration * 1000) + 1000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+
+                if(HelperFunctions.hasLight(context))
+                {
+                    //Log.d("")
+                }
+
+            }
+
+            public void onFinish() {
+                if(actualLetterIndex + 1 < letters.length)
+                {
+                    actualLetterIndex +=1;
+                    actualLetter = letters[actualLetterIndex];
+                    int duration = getLetterDuration(morseLetters.get(String.valueOf(actualLetter)));
+                    Log.d("Letra", actualLetter +" "+String.valueOf(duration));
+                    UpdateLetterView(duration);
+                }
+                else
+                {
+                    actualLetter = '-';
+                    UpdateLetterView(1);
+                }
+            }
+        }.start();*/
     }
 
     private void fillLetters()
@@ -126,7 +203,7 @@ public class MorseParser {
         this.morseLetters.put("P",P);
 
         Integer[] Q = {this.dash,this.dash,this.dot,this.dash};
-        this.morseLetters.put("O",O);
+        this.morseLetters.put("Q",Q);
 
         Integer[] R = {this.dot,this.dash,this.dot};
         this.morseLetters.put("R",R);
@@ -155,5 +232,99 @@ public class MorseParser {
         Integer[] Z = {this.dash,this.dash,this.dot,this.dot};
         this.morseLetters.put("Z",Z);
 
+        Integer[] a = {this.dot,this.dash};
+        this.morseLetters.put("a",a);
+
+        Integer[] b = {this.dash,this.dot,this.dot,this.dot};
+        this.morseLetters.put("b",b);
+
+        Integer[] c = {this.dash,this.dot,this.dash,this.dot};
+        this.morseLetters.put("c",c);
+
+        Integer[] d = {this.dash,this.dot,this.dot};
+        this.morseLetters.put("d",d);
+
+        Integer[] e = {this.dot};
+        this.morseLetters.put("e",e);
+
+        Integer[] f = {this.dot,this.dot,this.dash,this.dot};
+        this.morseLetters.put("f",f);
+
+        Integer[] g = {this.dash,this.dash,this.dot};
+        this.morseLetters.put("g",g);
+
+        Integer[] h = {this.dot,this.dot,this.dot,this.dot};
+        this.morseLetters.put("h",h);
+
+        Integer[] i = {this.dot,this.dot};
+        this.morseLetters.put("i",i);
+
+        Integer[] j = {this.dot,this.dash,this.dash,this.dash};
+        this.morseLetters.put("j",j);
+
+        Integer[] k = {this.dash,this.dot,this.dash};
+        this.morseLetters.put("k",k);
+
+        Integer[] l = {this.dot,this.dash,this.dot,this.dot};
+        this.morseLetters.put("l",l);
+
+        Integer[] m = {this.dash,this.dash};
+        this.morseLetters.put("m",m);
+
+        Integer[] n = {this.dash,this.dot};
+        this.morseLetters.put("n",n);
+
+        Integer[] o = {this.dash,this.dash,this.dash};
+        this.morseLetters.put("o",o);
+
+        Integer[] p = {this.dot,this.dash,this.dash,this.dot};
+        this.morseLetters.put("p",p);
+
+        Integer[] q = {this.dash,this.dash,this.dot,this.dash};
+        this.morseLetters.put("q",q);
+
+        Integer[] r = {this.dot,this.dash,this.dot};
+        this.morseLetters.put("r",r);
+
+        Integer[] s = {this.dot,this.dot,this.dot};
+        this.morseLetters.put("s",s);
+
+        Integer[] t = {this.dash};
+        this.morseLetters.put("t",t);
+
+        Integer[] u = {this.dot,this.dot,this.dash};
+        this.morseLetters.put("u",u);
+
+        Integer[] v = {this.dot,this.dot,this.dot,this.dash};
+        this.morseLetters.put("v",v);
+
+        Integer[] w = {this.dot,this.dash,this.dash};
+        this.morseLetters.put("w",w);
+
+        Integer[] x = {this.dash,this.dot,this.dot,this.dash};
+        this.morseLetters.put("x",x);
+
+        Integer[] y = {this.dash,this.dot,this.dash,this.dash};
+        this.morseLetters.put("y",y);
+
+        Integer[] z = {this.dash,this.dash,this.dot,this.dot};
+        this.morseLetters.put("z",z);
+
     }
+
+    public int getLetterDuration(Integer[] letter)
+    {
+        int count = 0;
+        for (int i = 0; i < letter.length ; i++)
+        {
+            count += letter[i];
+
+            if(letter.length -1 != i)
+            {
+                count += 1;
+            }
+        }
+        return  count;
+    }
+
 }
