@@ -2,6 +2,7 @@ package utilities;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.os.CountDownTimer;
 import android.util.Log;
 
@@ -37,5 +38,16 @@ public class HelperFunctions {
     {
 
     }
+
+    public void startLight()
+    {
+        Camera cam = Camera.open();
+        Camera.Parameters p = cam.getParameters();
+        p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        cam.setParameters(p);
+        cam.startPreview();
+    }
+
+
 
 }

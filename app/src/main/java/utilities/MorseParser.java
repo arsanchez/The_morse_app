@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import utilities.HelperFunctions;
 
 /**
  * Created by Argenis on 7/10/15.
@@ -29,6 +30,7 @@ public class MorseParser {
     public  char actualLetter;
     public int  actualLetterIndex;
     private Context context;
+    public boolean hasFlash;
 
     private Map<String, Integer[]> morseLetters = new HashMap<String, Integer[]>();
 
@@ -48,6 +50,7 @@ public class MorseParser {
         this.context = context;
         //filling the morse letters
         this.fillLetters();
+        this.hasFlash = HelperFunctions.hasLight(context);
     }
 
 
@@ -65,6 +68,12 @@ public class MorseParser {
 
         final int duration = parts[index];
         //Log.d("Test",String.valueOf(duration));
+
+        if(hasFlash)
+        {
+
+        }
+
         new CountDownTimer(duration * 1000, 1000) {
 
             public void onTick(long millisUntilFinished) {

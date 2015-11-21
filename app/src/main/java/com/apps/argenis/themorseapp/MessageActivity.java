@@ -133,9 +133,6 @@ public class MessageActivity extends Activity {
         MorseParser parser = new MorseParser(currentLetter,msgData,this);
         parser.displayMessage();
 
-        boolean hasFlash = HelperFunctions.hasLight(this);
-
-        Toast.makeText(this,String.valueOf(hasFlash),Toast.LENGTH_SHORT).show();
     }
 
     @Override
