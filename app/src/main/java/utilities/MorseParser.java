@@ -63,6 +63,7 @@ public class MorseParser {
 
     public void displayMessage()
     {
+        sender.hideResend();
         this.canContinue = true;
         this.actualLetter = this.letters[0];
         this.actualLetterIndex = 0;

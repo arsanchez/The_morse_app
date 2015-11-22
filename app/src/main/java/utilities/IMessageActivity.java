@@ -6,4 +6,5 @@ package utilities;
 public interface IMessageActivity {
 
     public void setResendButton();
+    public void hideResend();
 }

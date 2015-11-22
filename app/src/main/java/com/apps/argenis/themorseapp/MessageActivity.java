@@ -66,6 +66,8 @@ public class MessageActivity extends Activity implements IMessageActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getActionBar().hide();
+
         setContentView(R.layout.activity_message);
         setupActionBar();
 
@@ -137,12 +139,9 @@ public class MessageActivity extends Activity implements IMessageActivity{
         Bundle bundle  = getIntent().getExtras();
         msgData = bundle.getString("MESSAGE");
         parser = new MorseParser(currentLetter,msgData,this,this);
-        startParser();
-
         cancelButton = (Button)findViewById(R.id.cancel_button);
         resendButton = (Button)findViewById(R.id.resend_button);
-
-        resendButton.setVisibility(Button.GONE);
+        startParser();
         resendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -239,8 +238,13 @@ public class MessageActivity extends Activity implements IMessageActivity{
         resendButton.setVisibility(Button.VISIBLE);
     }
 
-    private void startParser()
-    {
+    @Override
+    public void hideResend() {
+        resendButton.setVisibility(Button.GONE);
+    }
+
+    private void startParser() {
         parser.displayMessage();
     }
+
 }
