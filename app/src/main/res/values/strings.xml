@@ -10,4 +10,5 @@
 
     <string name="dummy_content">D</string>
     <string name="empty_message_error">El mensaje no debe estar vacio</string>
+    <string name="resend_message_button">Reenviar</string>
 </resources>

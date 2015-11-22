@@ -31,6 +31,9 @@ public class MorseParser {
     public int  actualLetterIndex;
     private Context context;
     public boolean hasFlash;
+    public HelperFunctions helperFunctions;
+    private IMessageActivity sender;
+    public boolean canContinue;
 
     private Map<String, Integer[]> morseLetters = new HashMap<String, Integer[]>();
 
@@ -42,20 +45,25 @@ public class MorseParser {
         }
     };
 
-    public MorseParser(TextView currentLetter,String message,Context context)
+    public MorseParser(TextView currentLetter,String message,Context context,IMessageActivity sender)
     {
         this.currentLetter = currentLetter;
-        this.message = message;
+        //this.message = message.replace(" ","-");
         this.letters = message.toCharArray();
         this.context = context;
         //filling the morse letters
         this.fillLetters();
-        this.hasFlash = HelperFunctions.hasLight(context);
+        helperFunctions = new HelperFunctions();
+        this.hasFlash = helperFunctions.hasLight(context);
+        this.sender = sender;
+        this.canContinue = true;
+
     }
 
 
     public void displayMessage()
     {
+        this.canContinue = true;
         this.actualLetter = this.letters[0];
         this.actualLetterIndex = 0;
         int duration = getLetterDuration(morseLetters.get(String.valueOf(this.actualLetter)));
@@ -71,22 +79,41 @@ public class MorseParser {
 
         if(hasFlash)
         {
-
+            helperFunctions.startLight();
         }
 
         new CountDownTimer(duration * 1000, 1000) {
 
             public void onTick(long millisUntilFinished) {
+                if(!canContinue)
+                {
+                    try {
+                        helperFunctions.endLight();
+                        this.cancel();
+                    } catch (Throwable throwable) {
+                        throwable.printStackTrace();
+                    }
+                }
             }
 
             public void onFinish() {
 
+                helperFunctions.endLight();
                 Log.d("Letter part","Part number "+index+" of duration "+duration);
                 if(index < parts.length -1 )
                 {
                     new CountDownTimer((silence * 1000), 1000) {
 
                         public void onTick(long millisUntilFinished) {
+                            if(!canContinue)
+                            {
+                                try {
+                                    helperFunctions.endLight();
+                                    this.cancel();
+                                } catch (Throwable throwable) {
+                                    throwable.printStackTrace();
+                                }
+                            }
                         }
 
                         public void onFinish() {
@@ -102,11 +129,19 @@ public class MorseParser {
                     new CountDownTimer((space * 1000), 1000) {
 
                         public void onTick(long millisUntilFinished) {
-
+                            if(!canContinue)
+                            {
+                                try {
+                                    helperFunctions.endLight();
+                                    this.cancel();
+                                } catch (Throwable throwable) {
+                                    throwable.printStackTrace();
+                                }
+                            }
                         }
 
                         public void onFinish() {
-                            Log.d("Letter part","End of the word now a space");
+                            Log.d("Letter part","End of the letter now a space");
 
                             if(actualLetterIndex < letters.length -1)
                             {
@@ -116,7 +151,8 @@ public class MorseParser {
                             }
                             else
                             {
-
+                                Log.d("End","End of the message");
+                                sender.setResendButton();
                             }
                         }
                     }.start();
@@ -130,35 +166,44 @@ public class MorseParser {
         myHandler.post(myRunnable);
         Integer[] parts = morseLetters.get(String.valueOf(this.actualLetter));
         int currentPart = 0;
-        initializeLetterPart(parts,currentPart);
+        if(!String.valueOf(this.actualLetter).equals(" "))
+        {
+            Log.d("Letras",String.valueOf(this.actualLetter));
+            initializeLetterPart(parts, currentPart);
+        }
+        else
+        {
+            new CountDownTimer((space * 1000), 1000) {
 
-        /*new CountDownTimer((duration * 1000) + 1000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-
-                if(HelperFunctions.hasLight(context))
-                {
-                    //Log.d("")
+                public void onTick(long millisUntilFinished) {
+                    if(!canContinue)
+                    {
+                        try {
+                            helperFunctions.endLight();
+                            this.cancel();
+                        } catch (Throwable throwable) {
+                            throwable.printStackTrace();
+                        }
+                    }
                 }
 
-            }
+                public void onFinish() {
+                    Log.d("Letter part","space space space");
 
-            public void onFinish() {
-                if(actualLetterIndex + 1 < letters.length)
-                {
-                    actualLetterIndex +=1;
-                    actualLetter = letters[actualLetterIndex];
-                    int duration = getLetterDuration(morseLetters.get(String.valueOf(actualLetter)));
-                    Log.d("Letra", actualLetter +" "+String.valueOf(duration));
-                    UpdateLetterView(duration);
+                    if(actualLetterIndex < letters.length -1)
+                    {
+                        actualLetterIndex += 1;
+                        actualLetter  = letters[actualLetterIndex];
+                        UpdateLetterView();
+                    }
+                    else
+                    {
+                        Log.d("End","End of the message");
+                        sender.setResendButton();
+                    }
                 }
-                else
-                {
-                    actualLetter = '-';
-                    UpdateLetterView(1);
-                }
-            }
-        }.start();*/
+            }.start();
+        }
     }
 
     private void fillLetters()
@@ -334,6 +379,12 @@ public class MorseParser {
             }
         }
         return  count;
+    }
+
+
+    public void closeParser()
+    {
+        canContinue = false;
     }
 
 }

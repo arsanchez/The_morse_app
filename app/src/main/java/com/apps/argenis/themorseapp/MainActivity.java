@@ -38,27 +38,10 @@ public class MainActivity extends ActionBarActivity {
         btnEnviarMsg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                msg = msgText.getText().toString();
-
-                if(msg.length() > 0)
-                {
-                    Intent intent = new Intent(MainActivity.this,MessageActivity.class);
-                    intent.putExtra("MESSAGE",msg);
-                    startActivity(intent);
-                }
-                else
-                {
-                    Toast.makeText(getBaseContext(),getString(R.string.empty_message_error),Toast.LENGTH_SHORT).show();
-                }
-
-
+                sendMessage();
             }
         });
-
-
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -80,5 +63,21 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void sendMessage()
+    {
+        msg = msgText.getText().toString();
+
+        if(msg.length() > 0)
+        {
+            Intent intent = new Intent(MainActivity.this,MessageActivity.class);
+            intent.putExtra("MESSAGE",msg);
+            startActivity(intent);
+        }
+        else
+        {
+            Toast.makeText(getBaseContext(),getString(R.string.empty_message_error),Toast.LENGTH_SHORT).show();
+        }
     }
 }

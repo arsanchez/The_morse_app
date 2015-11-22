@@ -11,10 +11,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import utilities.HelperFunctions;
+import utilities.IMessageActivity;
 import utilities.MorseParser;
 
 
@@ -24,7 +26,7 @@ import utilities.MorseParser;
  *
  * @see SystemUiHider
  */
-public class MessageActivity extends Activity {
+public class MessageActivity extends Activity implements IMessageActivity{
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -55,6 +57,10 @@ public class MessageActivity extends Activity {
 
     String msgData;
     TextView currentLetter;
+    Button cancelButton;
+    Button resendButton;
+    MorseParser parser;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,8 +136,28 @@ public class MessageActivity extends Activity {
         //getting the message data
         Bundle bundle  = getIntent().getExtras();
         msgData = bundle.getString("MESSAGE");
-        MorseParser parser = new MorseParser(currentLetter,msgData,this);
-        parser.displayMessage();
+        parser = new MorseParser(currentLetter,msgData,this,this);
+        startParser();
+
+        cancelButton = (Button)findViewById(R.id.cancel_button);
+        resendButton = (Button)findViewById(R.id.resend_button);
+
+        resendButton.setVisibility(Button.GONE);
+        resendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startParser();
+            }
+        });
+
+        //when cancel is pressed the activity is closed
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                parser.closeParser();
+                MessageActivity.this.finish();
+            }
+        });
 
     }
 
@@ -205,5 +231,16 @@ public class MessageActivity extends Activity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    @Override
+    public void setResendButton() {
+
+        resendButton.setVisibility(Button.VISIBLE);
+    }
+
+    private void startParser()
+    {
+        parser.displayMessage();
     }
 }

@@ -11,6 +11,14 @@ import android.util.Log;
  */
 public class HelperFunctions {
 
+    Camera cam;
+    private boolean isFlashUsed = false;
+
+    public HelperFunctions()
+    {
+
+    }
+
     public static boolean hasLight(Context context)
     {
         PackageManager packageManager = context.getPackageManager();
@@ -20,32 +28,34 @@ public class HelperFunctions {
         return  flash;
     }
 
-    public void flashSignal(int duration)
-    {
-        new CountDownTimer(duration * 1000, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-
-            }
-
-            public void onFinish() {
-
-            }
-        }.start();
-    }
-
     public void soundSignal()
     {
 
     }
 
-    public void startLight()
+    public  void startLight()
     {
-        Camera cam = Camera.open();
-        Camera.Parameters p = cam.getParameters();
-        p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        cam.setParameters(p);
-        cam.startPreview();
+        if(!this.isFlashUsed)
+        {
+            cam = Camera.open();
+            Camera.Parameters p = cam.getParameters();
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            cam.setParameters(p);
+            cam.startPreview();
+            this.isFlashUsed = true;
+        }
+
+    }
+
+    public  void endLight()
+    {
+        if(this.isFlashUsed)
+        {
+            this.isFlashUsed = false;
+            cam.stopPreview();
+            cam.release();
+        }
+
     }
 
 
