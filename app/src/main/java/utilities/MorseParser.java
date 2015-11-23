@@ -58,6 +58,10 @@ public class MorseParser {
         this.sender = sender;
         this.canContinue = true;
 
+        for (int i = 0;i<this.letters.length;i++ )
+        {
+            Log.d("Letra",String.valueOf(Character.toChars(this.letters[i])));
+        }
     }
 
 

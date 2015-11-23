@@ -3,8 +3,14 @@ package utilities;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.CountDownTimer;
 import android.util.Log;
+
+import java.io.IOException;
 
 /**
  * Created by Argenis on 11/17/15.
@@ -28,7 +34,25 @@ public class HelperFunctions {
         return  flash;
     }
 
-    public void soundSignal()
+    public void playSound(Context context) throws IllegalArgumentException,
+            SecurityException,
+            IllegalStateException,
+            IOException
+    {
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        MediaPlayer mMediaPlayer = new MediaPlayer();
+        mMediaPlayer.setDataSource(context, soundUri);
+        final AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+
+        if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
+            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+            mMediaPlayer.setLooping(true);
+            mMediaPlayer.prepare();
+            mMediaPlayer.start();
+        }
+    }
+
+    public void stopSound()
     {
 
     }
