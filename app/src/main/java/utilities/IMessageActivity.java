@@ -7,4 +7,5 @@ public interface IMessageActivity {
 
     public void setResendButton();
     public void hideResend();
+    public void useBeep();
 }

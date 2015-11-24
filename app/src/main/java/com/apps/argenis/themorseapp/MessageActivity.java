@@ -4,6 +4,8 @@ import com.apps.argenis.themorseapp.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -60,6 +62,7 @@ public class MessageActivity extends Activity implements IMessageActivity{
     Button cancelButton;
     Button resendButton;
     MorseParser parser;
+    boolean isParserOpen;
 
 
     @Override
@@ -138,10 +141,19 @@ public class MessageActivity extends Activity implements IMessageActivity{
         //getting the message data
         Bundle bundle  = getIntent().getExtras();
         msgData = bundle.getString("MESSAGE");
-        parser = new MorseParser(currentLetter,msgData,this,this);
+
+        if(HelperFunctions.hasLight(this))
+        {
+            initMessage();
+        }
+        else
+        {
+            useBeep();
+        }
+
         cancelButton = (Button)findViewById(R.id.cancel_button);
         resendButton = (Button)findViewById(R.id.resend_button);
-        startParser();
+
         resendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,7 +165,11 @@ public class MessageActivity extends Activity implements IMessageActivity{
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                parser.closeParser();
+                if(isParserOpen)
+                {
+                    parser.closeParser();
+                    isParserOpen = false;
+                }
                 MessageActivity.this.finish();
             }
         });
@@ -232,6 +248,13 @@ public class MessageActivity extends Activity implements IMessageActivity{
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
+    public void initMessage()
+    {
+        this.isParserOpen = true;
+        parser = new MorseParser(currentLetter,msgData,this,this);
+        startParser();
+    }
+
     @Override
     public void setResendButton() {
 
@@ -247,4 +270,25 @@ public class MessageActivity extends Activity implements IMessageActivity{
         parser.displayMessage();
     }
 
+    @Override
+    public  void useBeep(){
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.string_no_flash_alert)
+                .setMessage(R.string.string_no_flash)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(R.string.string_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //initMessage();
+                        HelperFunctions.showToast(getBaseContext(),"To display sound message",Toast.LENGTH_SHORT);
+                    }
+                })
+                .setNegativeButton(R.string.string_no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        MessageActivity.this.finish();
+                    }
+                }).show();
+    }
 }

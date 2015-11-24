@@ -11,4 +11,8 @@
     <string name="dummy_content">D</string>
     <string name="empty_message_error">El mensaje no debe estar vacio</string>
     <string name="resend_message_button">Reenviar</string>
+    <string name="string_no">No</string>
+    <string name="string_yes">Si</string>
+    <string name="string_no_flash">Su dispositivo no posee flash, desea usar una señal de sonido?</string>
+    <string name="string_no_flash_alert">No flash disponible</string>
 </resources>

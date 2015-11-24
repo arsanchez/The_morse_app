@@ -9,6 +9,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -80,6 +81,11 @@ public class HelperFunctions {
             cam.release();
         }
 
+    }
+
+    public static void showToast(Context context, String message,int duration)
+    {
+        Toast.makeText(context,message,duration).show();
     }
 
 
